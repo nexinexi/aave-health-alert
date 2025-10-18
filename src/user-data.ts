@@ -1,14 +1,23 @@
 import { formatUnits } from 'viem'
 import type { PublicClient } from 'viem'
 import { POOL_ABI, network } from './presets'
+import { DECIMALS } from './constants'
+import { calculateUtilization } from './format'
 
-const HEALTH_FACTOR_DECIMALS = 18
-const BASE_CURRENCY_DECIMALS = 8
+export interface UserData {
+  healthFactor: string
+  totalCollateral: string
+  totalDebt: string
+  availableBorrows: string
+  liquidationThreshold: number
+  ltv: number
+  utilization: number
+}
 
-export async function getHealthFactor(
+export async function getUserData(
   client: PublicClient,
   userAddress: `0x${string}`,
-) {
+): Promise<UserData> {
   try {
     const data = await client.readContract({
       address: network.poolAddress,
@@ -28,17 +37,18 @@ export async function getHealthFactor(
 
     const formattedHealthFactor = formatUnits(
       healthFactor,
-      HEALTH_FACTOR_DECIMALS,
+      DECIMALS.HEALTH_FACTOR,
     )
     const formattedCollateral = formatUnits(
       totalCollateralBase,
-      BASE_CURRENCY_DECIMALS,
+      DECIMALS.BASE_CURRENCY,
     )
-    const formattedDebt = formatUnits(totalDebtBase, BASE_CURRENCY_DECIMALS)
+    const formattedDebt = formatUnits(totalDebtBase, DECIMALS.BASE_CURRENCY)
     const formattedAvailableBorrows = formatUnits(
       availableBorrowsBase,
-      BASE_CURRENCY_DECIMALS,
+      DECIMALS.BASE_CURRENCY,
     )
+    const utilization = calculateUtilization(formattedDebt, formattedCollateral)
 
     return {
       healthFactor: formattedHealthFactor,
@@ -47,6 +57,7 @@ export async function getHealthFactor(
       availableBorrows: formattedAvailableBorrows,
       liquidationThreshold: Number(currentLiquidationThreshold) / 100,
       ltv: Number(ltv) / 100,
+      utilization,
     }
   } catch (error) {
     console.error('Error fetching health factor:', error)

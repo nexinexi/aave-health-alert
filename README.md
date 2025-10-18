@@ -55,8 +55,16 @@ Optional configuration:
 
 ## Usage
 
+Development (watch mode):
+
 ```bash
 bun run dev
+```
+
+Production:
+
+```bash
+bun start
 ```
 
 The service will:

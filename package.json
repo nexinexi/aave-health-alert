@@ -2,7 +2,12 @@
   "name": "aave-health-alert",
   "type": "module",
   "scripts": {
-    "dev": "bun run src/index.ts"
+    "start": "bun run src/index.ts",
+    "dev": "bun --watch run src/index.ts",
+    "docker:prod": "docker compose up -d --build",
+    "docker:down": "docker compose down",
+    "docker:restart": "docker compose restart",
+    "docker:logs": "docker compose logs -f"
   },
   "devDependencies": {
     "@types/bun": "latest",

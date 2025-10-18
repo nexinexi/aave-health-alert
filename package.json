@@ -1,8 +1,9 @@
 {
   "name": "aave-liquidation-alert",
-  "module": "index.ts",
   "type": "module",
-  "private": true,
+  "scripts": {
+    "dev": "bun run src/index.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest",
     "prettier": "3.6.2"

@@ -18,6 +18,7 @@ export const LIMITS = {
 
 export const PUSHOVER = {
   API_URL: 'https://api.pushover.net/1/messages.json',
+  PRIORITY_NORMAL: 0,
   PRIORITY_EMERGENCY: 2,
   DEFAULT_SOUND: 'echo',
   DEFAULT_RETRY_SECONDS: 60,

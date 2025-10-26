@@ -1,19 +1,19 @@
 import type { PublicClient } from 'viem'
-import type { Logger } from './logger'
+import type { Logger, Address, Nullable } from '@/lib'
+import { formatCurrency, formatHealthFactor, formatPercent } from '@/lib'
 import { getUserData } from './user-data'
-import { buildNotification, sendNotification } from './notification'
-import { formatCurrency, formatHealthFactor, formatPercent } from './format'
+import { sendHealthAlert } from './notifications'
 
 export interface CheckHealthFactorOptions {
   client: PublicClient
-  wallet: `0x${string}`
+  wallet: Address
   hfThreshold: number
   alertExpireSeconds: number
   alertRetrySeconds: number
   logger: Logger
 }
 
-let nextAlertAllowedAt: number | null = null
+let nextAlertAllowedAt: Nullable<number> = null
 
 export async function checkHealthFactor(options: CheckHealthFactorOptions) {
   const {
@@ -49,9 +49,7 @@ export async function checkHealthFactor(options: CheckHealthFactorOptions) {
       })
 
       if (canSendAlert) {
-        const { title, message } = buildNotification(userData)
-
-        await sendNotification(title, message)
+        await sendHealthAlert(userData)
 
         // Set next allowed alert time to current time + expire duration
         nextAlertAllowedAt = now + alertExpireSeconds * 1000

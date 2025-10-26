@@ -1,13 +1,19 @@
 import type { SupportedChainKey } from './presets'
+import type { Address } from '@/lib'
 import { DEFAULTS, LIMITS, PUSHOVER } from './constants'
 
 interface Config {
-  wallet: `0x${string}`
+  wallet: Address
   hfThreshold: number
   pollIntervalMs: number
   chainName: SupportedChainKey
-  poolAddressOverride?: `0x${string}`
+  poolAddressOverride?: Address
   rpcUrlOverride?: string
+  schedule: {
+    morningHour: number
+    eveningHour: number
+    timezone: string
+  }
   pushover: {
     appToken: string
     userKey: string
@@ -54,13 +60,35 @@ function validateConfig(): Config {
     throw new Error('PUSHOVER_APP_TOKEN and PUSHOVER_USER_KEY are required')
   }
 
+  // Schedule settings (default: 8 and 20 in 24h format)
+  const morningHour = process.env.MORNING_HOUR
+    ? Number(process.env.MORNING_HOUR)
+    : 8
+  const eveningHour = process.env.EVENING_HOUR
+    ? Number(process.env.EVENING_HOUR)
+    : 20
+  const timezone = process.env.TIMEZONE || 'UTC'
+
+  // Validate hour values
+  if (morningHour < 0 || morningHour > 23 || Number.isNaN(morningHour)) {
+    throw new Error('MORNING_HOUR must be between 0 and 23')
+  }
+  if (eveningHour < 0 || eveningHour > 23 || Number.isNaN(eveningHour)) {
+    throw new Error('EVENING_HOUR must be between 0 and 23')
+  }
+
   return {
-    wallet: wallet as `0x${string}`,
+    wallet: wallet as Address,
     hfThreshold,
     pollIntervalMs,
     chainName: (process.env.CHAIN || 'arbitrum') as SupportedChainKey,
-    poolAddressOverride: process.env.POOL_ADDRESS as `0x${string}` | undefined,
+    poolAddressOverride: process.env.POOL_ADDRESS as Address,
     rpcUrlOverride: process.env.RPC_URL,
+    schedule: {
+      morningHour,
+      eveningHour,
+      timezone,
+    },
     pushover: {
       appToken: pushoverAppToken,
       userKey: pushoverUserKey,

@@ -17,6 +17,7 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "dayjs": "^1.11.18",
     "viem": "^2.38.3"
   }
 }

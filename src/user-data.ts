@@ -1,8 +1,10 @@
 import { formatUnits } from 'viem'
 import type { PublicClient } from 'viem'
-import { POOL_ABI, network } from './presets'
+import { network } from './presets'
+import { POOL_ABI } from './abi'
 import { DECIMALS } from './constants'
-import { calculateUtilization } from './format'
+import { calculateUtilization } from '@/lib'
+import type { Address } from '@/lib'
 
 export interface UserData {
   healthFactor: string
@@ -16,7 +18,7 @@ export interface UserData {
 
 export async function getUserData(
   client: PublicClient,
-  userAddress: `0x${string}`,
+  userAddress: Address,
 ): Promise<UserData> {
   try {
     const data = await client.readContract({

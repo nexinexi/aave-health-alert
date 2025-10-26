@@ -1,44 +1,46 @@
 import type { Chain } from 'viem'
 import { arbitrum, mainnet } from 'viem/chains'
 import { config } from './config'
+import type { Address } from '@/lib'
 
 export type SupportedChainKey = 'arbitrum' | 'ethereum'
 
-export const PRESETS: Record<
-  SupportedChainKey,
-  { chain: Chain; poolAddress: `0x${string}`; rpcUrl?: string }
-> = {
+interface ChainPreset {
+  chain: Chain
+  poolAddress: Address
+  priceFeeds: {
+    ETH_USD: Address
+    BTC_USD: Address
+  }
+  rpcUrl?: string
+}
+
+export const PRESETS: Record<SupportedChainKey, ChainPreset> = {
   arbitrum: {
     chain: arbitrum,
     // https://arbiscan.io/address/0x794a61358D6845594F94dc1DB02A252b5b4814aD
     poolAddress: '0x794a61358D6845594F94dc1DB02A252b5b4814aD',
     rpcUrl: 'https://arb1.arbitrum.io/rpc',
+    // Chainlink Price Feeds on Arbitrum
+    // https://docs.chain.link/data-feeds/price-feeds/addresses?network=arbitrum
+    priceFeeds: {
+      ETH_USD: '0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612',
+      BTC_USD: '0x6ce185860a4963106506C203335A2910413708e9',
+    },
   },
   ethereum: {
     chain: mainnet,
     // https://etherscan.io/address/0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2
     poolAddress: '0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2',
     rpcUrl: 'https://eth.llamarpc.com',
+    // Chainlink Price Feeds on Ethereum Mainnet
+    // https://docs.chain.link/data-feeds/price-feeds/addresses?network=ethereum
+    priceFeeds: {
+      ETH_USD: '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419',
+      BTC_USD: '0xF4030086522a5bEEa4988F8cA5B36dbC97BeE88c',
+    },
   },
 }
-
-// https://aave.com/docs/developers/smart-contracts/pool#view-methods-getuseraccountdata
-export const POOL_ABI = [
-  {
-    inputs: [{ name: 'user', type: 'address' }],
-    name: 'getUserAccountData',
-    outputs: [
-      { name: 'totalCollateralBase', type: 'uint256' },
-      { name: 'totalDebtBase', type: 'uint256' },
-      { name: 'availableBorrowsBase', type: 'uint256' },
-      { name: 'currentLiquidationThreshold', type: 'uint256' },
-      { name: 'ltv', type: 'uint256' },
-      { name: 'healthFactor', type: 'uint256' },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-] as const
 
 export const network = (function () {
   const chainName = config.chainName
@@ -54,5 +56,9 @@ export const network = (function () {
   const poolAddress = envAddress ?? preset!.poolAddress
   const rpcUrl = config.rpcUrlOverride ?? preset?.rpcUrl
 
-  return { chain: preset.chain, poolAddress, rpcUrl }
+  return {
+    ...preset,
+    poolAddress,
+    rpcUrl,
+  }
 })()

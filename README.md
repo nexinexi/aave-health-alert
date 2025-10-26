@@ -6,9 +6,11 @@ A monitoring service that tracks your AAVE position's health factor and sends em
 
 - 🔄 Continuous monitoring of AAVE health factor
 - 🚨 Emergency push notifications (Priority 2) via Pushover
+- 📅 Scheduled daily reports (morning & evening) with health factor and crypto prices
 - ⏰ Configurable polling intervals and alert cooldowns
 - 🔗 Support for multiple chains (Arbitrum, Ethereum)
 - 📊 Detailed account information in alerts
+- 💰 Real-time ETH & BTC prices from Chainlink oracles
 
 ## Why I built this
 
@@ -47,6 +49,9 @@ Optional configuration:
 - `CHAIN`: Network to monitor (default: `arbitrum`)
 - `HF_THRESHOLD`: Health factor threshold for alerts (default: `1.3`)
 - `POLL_INTERVAL_MS`: How often to check (default: `15000` ms)
+- `MORNING_HOUR`: Hour to send morning report in 24h format (default: `8`). Range: `0-23`
+- `EVENING_HOUR`: Hour to send evening report in 24h format (default: `20`). Range: `0-23`
+- `TIMEZONE`: Timezone for scheduled reports (default: `UTC`). Examples: `America/New_York`, `Europe/London`, `Asia/Tokyo`
 - `RPC_URL`: Custom RPC endpoint (optional)
 - `POOL_ADDRESS`: Custom AAVE pool address (optional)
 - `PUSHOVER_NOTIFICATION_SOUND`: Notification sound (default: `echo`)
@@ -71,10 +76,13 @@ The service will:
 
 1. Check your AAVE health factor at the configured interval
 2. If health factor drops below threshold, send an emergency push notification
-3. Emergency notifications (Priority 2) will retry at the configured interval until acknowledged or expired (Pushover behavior)
-4. The service suppresses new emergency alerts until either the expiration window passes or health factor recovers above the threshold (then the cooldown resets)
+3. Send scheduled daily reports (normal priority) at morning and evening times
+4. Emergency notifications (Priority 2) will retry at the configured interval until acknowledged or expired (Pushover behavior)
+5. The service suppresses new emergency alerts until either the expiration window passes or health factor recovers above the threshold (then the cooldown resets)
 
-## Emergency Notifications
+## Notifications
+
+### Emergency Alerts
 
 When your health factor drops below the threshold, you'll receive a **Priority 2 emergency notification** that:
 
@@ -85,6 +93,22 @@ When your health factor drops below the threshold, you'll receive a **Priority 2
 - Shows detailed position information
 
 Tip: To ensure alerts can break through Do Not Disturb, keep notifications at priority 2 (emergency) in your configuration and verify Pushover is allowed to override DND on your device.
+
+### Scheduled Daily Reports
+
+The service automatically sends **normal priority notifications** twice daily (configurable times):
+
+- Morning report (default: 8:00 / 8 AM)
+- Evening report (default: 20:00 / 8 PM)
+
+Each report includes:
+
+- Current health factor
+- ETH price (from Chainlink oracle)
+- BTC price (from Chainlink oracle)
+- Chain and wallet information
+
+These reports use normal priority (0) so they won't disturb you, but keep you informed of your position and market conditions.
 
 ## Supported Chains
 

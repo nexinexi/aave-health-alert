@@ -1,8 +1,9 @@
 import type { PublicClient } from 'viem'
 import type { Logger, Address, Nullable } from '@/lib'
 import { formatCurrency, formatHealthFactor, formatPercent } from '@/lib'
+import { PUSHOVER } from '@/constants'
 import { getUserData } from './user-data'
-import { sendHealthAlert } from './notifications'
+import { sendNotification } from './notification'
 
 export interface CheckHealthFactorOptions {
   client: PublicClient
@@ -49,7 +50,10 @@ export async function checkHealthFactor(options: CheckHealthFactorOptions) {
       })
 
       if (canSendAlert) {
-        await sendHealthAlert(userData)
+        await sendNotification({
+          userData,
+          priority: PUSHOVER.PRIORITY_EMERGENCY,
+        })
 
         // Set next allowed alert time to current time + expire duration
         nextAlertAllowedAt = now + alertExpireSeconds * 1000

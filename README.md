@@ -5,7 +5,7 @@ A monitoring service that tracks your AAVE position's health factor and sends em
 ## Features
 
 - 🔄 Continuous monitoring of AAVE health factor
-- 🚨 Emergency push notifications that break through Do Not Disturb (via Pushover)
+- 🚨 Emergency push notifications when health factor drops below threshold (breaks through Do Not Disturb via Pushover)
 - 📅 Scheduled daily reports (morning & evening) with health factor and crypto prices
 - ⏰ Configurable polling intervals and alert cooldowns
 - 🔗 Support for multiple chains (Arbitrum, Ethereum)
@@ -87,8 +87,8 @@ bun start
 The service will:
 
 1. Check your AAVE health factor at the configured interval
-2. If health factor drops below threshold, send an emergency push notification
-3. Send scheduled daily reports (non-urgent) at morning and evening times
+2. Send scheduled daily reports (normal priority) at morning and evening times with your position data
+3. **If health factor drops below threshold**, immediately send an **emergency notification** that breaks through Do Not Disturb
 4. Emergency notifications will retry at the configured interval until acknowledged or expired (Pushover behavior)
 5. The service suppresses new emergency alerts until either the expiration window passes or health factor recovers above the threshold (then the cooldown resets)
 

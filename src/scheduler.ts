@@ -3,7 +3,7 @@ import type { Logger, Address, Nullable } from '@/lib'
 import { dayjs } from '@/lib'
 import { getUserData } from './user-data'
 import { getCryptoPrices } from './price-feed'
-import { sendScheduledNotification } from './notifications'
+import { sendNotification } from './notification'
 
 export interface ScheduledNotificationOptions {
   client: PublicClient
@@ -54,7 +54,7 @@ export async function checkScheduledNotifications(
         getCryptoPrices(client, priceFeeds),
       ])
 
-      await sendScheduledNotification({
+      await sendNotification({
         userData,
         prices,
         chainName,
@@ -75,7 +75,7 @@ export async function checkScheduledNotifications(
         getCryptoPrices(client, priceFeeds),
       ])
 
-      await sendScheduledNotification({
+      await sendNotification({
         userData,
         prices,
         chainName,

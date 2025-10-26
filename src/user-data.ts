@@ -3,7 +3,7 @@ import type { PublicClient } from 'viem'
 import { network } from './presets'
 import { POOL_ABI } from './abi'
 import { DECIMALS } from './constants'
-import { calculateUtilization } from '@/lib'
+import { calculateUtilization, calculateBorrowPowerUsed } from '@/lib'
 import type { Address } from '@/lib'
 
 export interface UserData {
@@ -14,6 +14,7 @@ export interface UserData {
   liquidationThreshold: number
   ltv: number
   utilization: number
+  borrowPowerUsed: number
 }
 
 export async function getUserData(
@@ -51,6 +52,10 @@ export async function getUserData(
       DECIMALS.BASE_CURRENCY,
     )
     const utilization = calculateUtilization(formattedDebt, formattedCollateral)
+    const borrowPowerUsed = calculateBorrowPowerUsed(
+      formattedDebt,
+      formattedAvailableBorrows,
+    )
 
     return {
       healthFactor: formattedHealthFactor,
@@ -60,6 +65,7 @@ export async function getUserData(
       liquidationThreshold: Number(currentLiquidationThreshold) / 100,
       ltv: Number(ltv) / 100,
       utilization,
+      borrowPowerUsed,
     }
   } catch (error) {
     console.error('Error fetching health factor:', error)

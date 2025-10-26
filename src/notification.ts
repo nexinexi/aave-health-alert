@@ -1,6 +1,11 @@
 import { AAVE, PUSHOVER } from '@/constants'
 import { config } from '@/config'
-import { formatCurrency, formatHealthFactor, logger } from '@/lib'
+import {
+  formatCurrency,
+  formatHealthFactor,
+  formatPercent,
+  logger,
+} from '@/lib'
 import type { CryptoPrices } from '@/price-feed'
 import type { UserData } from '@/user-data'
 
@@ -71,6 +76,7 @@ function buildMessage(params: NotificationParams): string {
   const collateral = formatCurrency(userData.totalCollateral)
   const debt = formatCurrency(userData.totalDebt)
   const availableBorrows = formatCurrency(userData.availableBorrows)
+  const borrowPowerUsed = formatPercent(userData.borrowPowerUsed)
 
   const isEmergency = priority === PUSHOVER.PRIORITY_EMERGENCY
 
@@ -94,6 +100,7 @@ function buildMessage(params: NotificationParams): string {
 • Collateral: ${collateral}
 • Debt: ${debt}
 • Available to Borrow: ${availableBorrows}
+• Borrow Power Used: ${borrowPowerUsed}
 
 ${pricesSection}🔗 Chain: ${chainName}
 💳 Wallet: ${wallet}${warningFooter}`

@@ -30,3 +30,18 @@ export function calculateUtilization(
 
   return (debt / collateral) * 100
 }
+
+export function calculateBorrowPowerUsed(
+  totalDebt: string | number,
+  availableBorrows: string | number,
+): number {
+  const debt = parseFloat(totalDebt.toString())
+  const available = parseFloat(availableBorrows.toString())
+  const totalBorrowPower = debt + available
+
+  if (totalBorrowPower <= 0) {
+    return 0
+  }
+
+  return (debt / totalBorrowPower) * 100
+}
